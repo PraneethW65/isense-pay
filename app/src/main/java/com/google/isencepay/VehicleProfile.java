@@ -13,11 +13,15 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class VehicleProfile extends AppCompatActivity {
 
@@ -55,6 +59,7 @@ public class VehicleProfile extends AppCompatActivity {
         from = findViewById(R.id.from);
 
         reg = getIntent().getStringExtra("Vehicle");
+        regis.setText("Registration No : "+reg);
 
         db = FirebaseFirestore.getInstance();
 
@@ -92,7 +97,11 @@ public class VehicleProfile extends AppCompatActivity {
                         na.setText("NAME : "+document.get("oName").toString());
                         address.setText("ADDRESS : "+document.get("address").toString());
                         feee.setText("ANNUAL FEE : "+document.get("AnnualFee").toString());
-                        from.setText("VALID FROM : "+document.get("From").toString());
+                        Timestamp timestamp=(Timestamp)document.get("From");
+                        Date date = timestamp.toDate();
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                        String strDate= formatter.format(date);
+                        from.setText("VALID FROM : "+ strDate);
                     } else {
                         Log.d(TAG, "No such document");
                     }

@@ -11,8 +11,10 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +28,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Reminders extends AppCompatActivity {
@@ -35,8 +39,9 @@ public class Reminders extends AppCompatActivity {
     public String TAG="SRA";
     private LinearLayout LL;
     private FirebaseFirestore db;
-    private EditText customReg;
+    private Spinner customReg;
     private EditText months;
+    public ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +55,36 @@ public class Reminders extends AppCompatActivity {
         LL=(LinearLayout) this.findViewById(R.id.ll);
 
         customReg=findViewById(R.id.reg);
+        List<String> vehicles = new ArrayList<>();
+        adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, vehicles);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        customReg.setAdapter(adapter);
+
         months=findViewById(R.id.months);
 
         db = FirebaseFirestore.getInstance();
+
+        db.collection("MyList")
+                .whereEqualTo("NIC", nic)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                String reg = document.getString("Vehicle");
+                                vehicles.add(reg);
+                            }
+
+                            adapter.notifyDataSetChanged();
+
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
 
         db.collection("Reminders")
                 .whereEqualTo("NIC", nic)
@@ -93,7 +125,8 @@ public class Reminders extends AppCompatActivity {
     }
 
     public void addNew(View view){
-        String Reg=customReg.getText().toString();
+        String Reg=customReg.getSelectedItem().toString();
+        Log.d(TAG, "spinner: "+ Reg);
         String Months=months.getText().toString();
         Map<String, String> user = new HashMap<>();
         user.put("NIC", nic);
