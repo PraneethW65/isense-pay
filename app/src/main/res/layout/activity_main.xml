@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:context=".MainActivity">
 
     <com.google.android.gms.common.SignInButton
@@ -12,27 +11,28 @@
         android:layout_width="150dp"
         android:layout_height="45dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="24dp"
+        android:fadingEdge="horizontal"
         android:onClick="goGoogleSignIn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/hello"
-        android:layout_width="259dp"
-        android:layout_height="0dp"
+        android:layout_width="225dp"
+        android:layout_height="45dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="377dp"
-        android:layout_marginEnd="8dp"
-        android:fontFamily="sans-serif"
-        android:text="I -Sence Pay"
+        android:layout_marginTop="536dp"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="serif"
+        android:text="I-Sense Pay"
         android:textAlignment="center"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/dark_blue"
         android:textSize="36sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.536"
+        app:layout_constraintBottom_toTopOf="@+id/reqmsg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,28 +41,25 @@
         android:layout_width="171dp"
         android:layout_height="162dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="96dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="356dp"
+        android:layout_marginBottom="18dp"
         android:requiresFadingEdge="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/hello"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/car" />
+        app:srcCompat="@drawable/icon" />
 
     <TextView
         android:id="@+id/reqmsg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="8dp"
-        android:fontFamily="monospace"
-        android:text="Welcome"
-        android:textColor="#FFFFFF"
-        android:textSize="36sp"
+        android:fontFamily="serif"
+        android:text="Future of vehicle revenue license"
+        android:textColor="@color/design_default_color_primary"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/hello" />
 

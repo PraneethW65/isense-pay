@@ -3,9 +3,13 @@ package com.google.isencepay;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -27,12 +31,15 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.model.Document;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Offences extends AppCompatActivity {
@@ -46,6 +53,7 @@ public class Offences extends AppCompatActivity {
     public ArrayAdapter<String> adapter;
     private String reg;
     private String strDate;
+    public String add;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +124,7 @@ public class Offences extends AppCompatActivity {
                                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                                 strDate = formatter.format(date);
                                 reg=document.get("Vehicle").toString();
-                                tv.setText(reg+ "     Date : "+strDate+"       (click to pay)");
+                                tv.setText(reg+ "     Date : "+strDate+"         Location :"+getAddress(document.getDouble("latitude"),document.getDouble("longitude"))+"      (click to pay)");
                                 LL.addView(tv);
 
                                 tv.setOnClickListener(new View.OnClickListener() {
@@ -134,54 +142,81 @@ public class Offences extends AppCompatActivity {
                 });
     }
 
-    public void renew(View view){
+    public String getAddress(double lat, double lng) {
+        Geocoder geocoder = new Geocoder(Offences.this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            Address obj = addresses.get(0);
+            add = obj.getAddressLine(0);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
 
+        return add;
     }
 
     public void pay(String off,String reg,String Date){
 
-        Map<String, Object> user = new HashMap<>();
-        user.put("NIC", nic);
-        user.put("Vehicle", reg);
-        user.put("Date", new Timestamp(new Date()));
-        user.put("ReportedDate", Date);
-        user.put("Amount", 2000);
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+        dlgAlert.setMessage("Click OK to confirm payment");
+        dlgAlert.setTitle("Payment Confirmation");
 
-        // Add a new document with a generated ID
-        db.collection("History")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+        dlgAlert.setPositiveButton("Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
 
-                        DocumentReference DocRef = db.collection("Report").document(off);
-                        DocRef.update("Paid", true)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        Map<String, Object> user = new HashMap<>();
+                        user.put("NIC", nic);
+                        user.put("Vehicle", reg);
+                        user.put("Date", new Timestamp(new Date()));
+                        user.put("ReportedDate", Date);
+                        user.put("Amount", 2000);
+
+                        // Add a new document with a generated ID
+                        db.collection("History")
+                                .add(user)
+                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                     @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(Offences.this, "Successfully Paid", Toast.LENGTH_SHORT).show();
-                                        Intent intent=new Intent(Offences.this, Home.class);
-                                        startActivity(intent);
-                                        finish();
+                                    public void onSuccess(DocumentReference documentReference) {
+                                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+
+                                        DocumentReference DocRef = db.collection("Report").document(off);
+                                        DocRef.update("Paid", true)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Toast.makeText(Offences.this, "Successfully Paid", Toast.LENGTH_SHORT).show();
+                                                        Intent intent=new Intent(Offences.this, Home.class);
+                                                        startActivity(intent);
+                                                        finish();
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w(TAG, "Error updating document", e);
+                                                    }
+                                                });
+
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Log.w(TAG, "Error updating document", e);
+                                        Log.w(TAG, "Error adding document", e);
+                                        Toast.makeText(Offences.this, "Something Wrong", Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                        Toast.makeText(Offences.this, "Something Wrong", Toast.LENGTH_SHORT).show();
+
+
                     }
                 });
+
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
 
 
 

@@ -145,6 +145,10 @@ public class Home extends AppCompatActivity {
         editor.putString("NIC",null);
         editor.apply();
 
+        Intent intent=new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+
         mAuth.signOut();
     }
 

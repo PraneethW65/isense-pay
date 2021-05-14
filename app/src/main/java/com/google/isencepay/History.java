@@ -92,6 +92,7 @@ public class History extends AppCompatActivity {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
                                 LinearLayout.LayoutParams lparams = new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                
                                 TextView tv = new TextView(History.this);
                                 lparams.gravity = Gravity.CENTER;
                                 lparams.setMargins(10, 40, 10, 10);
