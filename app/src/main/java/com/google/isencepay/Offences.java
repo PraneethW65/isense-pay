@@ -146,8 +146,12 @@ public class Offences extends AppCompatActivity {
         Geocoder geocoder = new Geocoder(Offences.this, Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
-            Address obj = addresses.get(0);
-            add = obj.getAddressLine(0);
+            if(addresses.isEmpty()){
+                add="Location Unknown(Longitute"+lng+",Latitude"+lat+")";
+            }else {
+                Address obj = addresses.get(0);
+                add = obj.getAddressLine(0);
+            }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
